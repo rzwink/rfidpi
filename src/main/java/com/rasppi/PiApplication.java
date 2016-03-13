@@ -1,11 +1,5 @@
 package com.rasppi;
 
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialDataEvent;
 import com.pi4j.io.serial.SerialDataListener;
@@ -13,26 +7,36 @@ import com.pi4j.io.serial.SerialFactory;
 
 import java.util.Date;
 
-@RestController
-@EnableAutoConfiguration
-@SpringBootApplication
 public class PiApplication {
 
-	@RequestMapping("/")
-	String home() {
-		return "Hello World!";
-	}
-
+	private final String COMPORT_CARDREADER = "/dev/ttyUSB0";
+	private final String BAUD_CARDREADER = "2400";
+	
+	private final String COMPORT_LCDDISPLAY = "/dev/ttyUSB1";
+	private final String BAUD_LCDDISPLAY = "19200";
+	
 	// - Get an instance of Serial for COM interaction
-	private final Serial serial = SerialFactory.createInstance();
+	private final Serial serialCardReader = SerialFactory.createInstance();
+	private final Serial serialLCDDisplay = SerialFactory.createInstance();
 
-	public PiApplication()
-	{
-		// - Change this to the COM port of your RFID reader
-		String comPort = "/dev/ttyUSB0";
-
+	
+	private void openCardReader(){
 		// - Create and add a SerialDataListener
-		serial.addListener(new SerialDataListener()
+		serialCardReader.open( COMPORT_CARDREADER, BAUD_CARDREADER );
+	}
+	
+	private void openLCDDisplay(){
+		serialLCDDisplay.open( COMPORT_LCDDISPLAY, BAUD_LCDDISPLAY );
+	}
+	
+	
+	public PiApplication(String[] args)
+	{
+		openCardReader();
+		openLCDDisplay();
+		
+		// - Create and add a SerialDataListener
+		serialCardReader.addListener(new SerialDataListener()
 		{
 			@Override
 			public void dataReceived(SerialDataEvent event)
@@ -55,8 +59,7 @@ public class PiApplication {
 		});
 
 
-		// - Attempt to open the COM port
-		serial.open( comPort, 2400 );
+
 
 		// - When you are done, ensure you close the port
 		// To demonstrate, I am waiting 20 seconds and then closing the port.
@@ -79,6 +82,6 @@ public class PiApplication {
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(PiApplication.class, args);
+		new PiApplication(args);
 	}
 }
