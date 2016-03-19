@@ -61,6 +61,11 @@ public class PiApplication {
 				currentToken = "";
 				try {
 					Thread.sleep(2000);
+					// reset screen
+					serialLCDDisplay.write((char) 0x0C);
+					// turn off backlight
+					serialLCDDisplay.write((char) 0x12);
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -78,7 +83,7 @@ public class PiApplication {
 	public PiApplication(String[] args) {
 		people.put("104867484851545049525513", new Person("Emma"));
 		people.put("105169484853575149506813", new Person("John"));
-		people.put("105351484850485567695313", new Person("Peter"));
+		people.put("105351484850485567695313", new Person("Lili"));
 		people.put("105351484850486956486613", new Person("Logan"));
 		people.put("104849486969707067676813", new Person("Wade"));
 		
@@ -93,17 +98,14 @@ public class PiApplication {
 		// To demonstrate, I am waiting 20 seconds and then closing the port.
 		try {
 			// - Sleep for 20 seconds, (in ms)
-			Thread.sleep(20000);
-			// reset screen
-			serialLCDDisplay.write((char) 0x0C);
-			// turn off backlight
-			serialLCDDisplay.write((char) 0x12);
+			while(true){continue;}
 
+		} catch (Exception ex) {
+			// - I am intentionally ignoring any exception.
 			// - Close port
 			serialCardReader.close();
 			System.out.println("COM port closed.");
-		} catch (Exception ex) {
-			// - I am intentionally ignoring any exception.
+
 		}
 
 		// - And terminate
